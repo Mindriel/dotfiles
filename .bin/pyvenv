@@ -1,0 +1,54 @@
+#!/bin/bash
+
+BASE_DIR=$(dirname "$0")
+HELPERS_DIR="${BASE_DIR}"/helpers
+. ${HELPERS_DIR}/req_exitOnFirstFail
+. ${HELPERS_DIR}/req_noSudo
+
+if [ $# -gt 1 ]; then
+  filename=$(basename "${0}")
+  echo "Usage: '${filename}' [<venv directory name>]"
+  exit 2
+fi
+
+GREEN="\e[32m"
+RESET="\e[m"
+PYTHON='python2'
+
+if [ $# -eq 1 ]; then
+  ENV_NAME=$1
+else
+  ENV_NAME=.`basename ${0}`
+fi
+
+which virtualenv > /dev/null
+if [ $? -ne 0 ]; then
+  echo 'No virtualenv found. Installing:'
+  ${PYTHON} `which pip` install virtualenv
+  echo 'Installed virtualenv.'
+fi
+
+if [[ ! -d ${ENV_NAME} ]]; then
+  echo "Python virtualenv not setup yet. Creating one in ${ENV_NAME} directory..."
+  ${PYTHON} `which virtualenv` ${ENV_NAME}
+  echo 'Setup done.'
+fi
+
+echo "Activating: ${ENV_NAME}/bin/activate"
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+source ${ENV_NAME}/bin/activate
+
+if [[ -f 'requirements.txt' ]]; then
+  echo 'Requirements file found. Installing:'
+  pip install -r requirements.txt
+  echo 'Installed.'
+fi
+
+echo 'Deactivated:  ${ENV_NAME}/bin/activate ."
+
+echo '-------------------'
+echo "Remember to activate by running:"
+#echo -e "${GREEN}  export VIRTUAL_ENV_DISABLE_PROMPT=1 ${RESET}"
+echo -e "${GREEN}  source ${ENV_NAME}/bin/activate ${RESET}"
+echo '-------------------'
+echo 'Bye bye B-)'
