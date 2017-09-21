@@ -1,0 +1,176 @@
+# Addition to ~/.bashrc
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && echo -e "$-\nUse this only as a source source :)" && return
+
+#  Aliases
+alias sudo='sudo '
+alias ls='ls --color=auto'
+alias la='ls -A'
+alias l='ls -lAF'
+alias ll='ls -la'
+alias lt='ll -t'
+alias lh='ls -lah'
+alias ssh='ssh '
+alias grep='grep --color=auto'
+
+#  GIT aliases
+alias gs="git status"
+alias ga="git add"
+alias gsh="git commit -m \"sh\""
+alias gwip="git commit -m \"wip\""
+alias gworks='git commit -m "sh - everything works!"'
+
+#  Default editor
+export EDITOR=vim
+export GIT_EDITOR=vim
+
+#  Colours
+### TPUT solution corrupts the way ctrl+R works - TODO: find out why and how can it be fixed
+#GRAY="$(tput setaf 0)"
+#RED="$(tput setaf 1)"
+#GREEN="$(tput setaf 2)"
+#YELLOW="$(tput setaf 3)"
+#BLUE="$(tput setaf 4)"
+#MAGENTA="$(tput setaf 5)"
+#TEAL="$(tput setaf 6)"
+#WHITE="$(tput setaf 7)"
+#GRAY_WHITE="$(tput setaf 8)"
+#RESET="$(tput sgr0)"
+### ^
+RED="\[\e[31m\]"
+GREEN="\[\e[32m\]"
+YELLOW="\[\e[33m\]"
+BLUE="\[\e[34m\]"
+MAGENTA="\[\e[35m\]"
+CYAN="\[\e[36m\]"
+LIGHT_GRAY="\[\e[37m\]"
+
+DARK_GRAY="\[\e[90m\]"
+LIGHT_RED="\[\e[91m\]"
+LIGHT_GREEN="\[\e[92m\]"
+LIGHT_YELLOW="\[\e[93m\]"
+LIGHT_BLUE="\[\e[94m\]"
+LIGHT_MAGENTA="\[\e[95m\]"
+LIGHT_CYAN="\[\e[96m\]"
+LIGHT_WHITE="\[\e[97m\]"
+
+RESET="\[\e[m\]"
+
+
+if [ ! -v DEFAULT_USER ]; then
+    # LOGNAME vs USER ?
+    DEFAULT_USER=$USER
+fi
+
+USER_COLOR=""
+case "$HOME" in
+    "/home/${DEFAULT_USER}") USER_COLOR="${BLUE}" ;;
+    "/root")            USER_COLOR="${RED}"  ;;
+    *)                 USER_COLOR="${CYAN}"
+esac
+
+# Simple version
+# PS1_BACKUP=$PS1
+# PS1="${debian_chroot:+($debian_chroot)}${RED}\u${YELLOW}@\h${RED}[${GREEN}\W${RED}]${BLUE} > ${RESET}"
+
+# More fancy version
+
+function parse_git_branch() {
+    BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* [(]*\([^)]*\)[)]*/\1/' -e 's/HEAD detached at/{D}/'`
+    if [ ! "${BRANCH}" == "" ]; then
+        echo "(${BRANCH})"
+    else
+        echo ""
+    fi
+}
+
+function parse_git_status {
+    RED="\e[31m"
+    GREEN="\e[32m"
+    RESTORE="\e[35m" # MAGENTA
+
+    status=`git status 2>&1 | tee`
+    modified=`echo -n "${status}" 2> /dev/null | grep "modified:" &> /dev/null; echo "$?"`
+    untracked=`echo -n "${status}" 2> /dev/null | grep "Untracked files" &> /dev/null; echo "$?"`
+    ahead=`echo -n "${status}" 2> /dev/null | grep "Your branch is ahead of" &> /dev/null; echo "$?"`
+    newfile=`echo -n "${status}" 2> /dev/null | grep "new file:" &> /dev/null; echo "$?"`
+    renamed=`echo -n "${status}" 2> /dev/null | grep "renamed:" &> /dev/null; echo "$?"`
+    deleted=`echo -n "${status}" 2> /dev/null | grep "deleted:" &> /dev/null; echo "$?"`
+    bits="("
+
+    if [ "${renamed}" == "0" ]; then #bits=">${bits}"
+        bits="${bits}r"
+    fi
+    if [ "${ahead}" == "0" ]; then #bits="*${bits}"
+        bits="${bits}a"
+    fi
+    if [ "${newfile}" == "0" ]; then #bits="+${bits}"
+        bits="${bits}n"
+        #bits="${bits}${GREEN}n${RESTORE}"
+    fi
+    if [ "${untracked}" == "0" ]; then #bits="?${bits}"
+        bits="${bits}u"
+        #bits="${bits}${RED}u${RESTORE}"
+    fi
+    if [ "${deleted}" == "0" ]; then #bits="x${bits}"
+        bits="${bits}d"
+    fi
+    if [ "${modified}" == "0" ]; then #bits="!${bits}"
+        bits="${bits}m"
+    fi
+    if [ ! "${bits}" == "(" ]; then
+        echo "${bits})"
+    else
+        echo ""
+    fi
+}
+
+VIRTUAL_ENV_DISABLE_PROMPT=1 # disable the default virtualenv prompt change
+function virtualenv_info() {
+    # Get Virtual Env
+    if [ -n "$VIRTUAL_ENV" ]; then
+        # Strip out the path and just leave the env name
+        venv="${VIRTUAL_ENV##*/}"
+    else
+        # In case you don't have one activated
+        venv=''
+    fi
+    [ -n "$venv" ] && echo "(venv:$venv)"
+}
+
+rozenfel_set_bash_prompt() {
+    RETCODE=$?
+    RETCODE=`[ $RETCODE -ne 0 ] && echo " $RETCODE"`
+
+    local VENV="\$(virtualenv_info)";
+    PS1=${USER_COLOR}"\u"
+
+    if [ ! -v OMIT_HOSTNAME ]; then
+        PS1=${PS1}"${YELLOW}@\h${BLUE}"
+    fi
+
+    PS1=${PS1}"[${GREEN}\W${USER_COLOR}]"
+
+    if [ -v GITUJ ]; then
+        PS1=${PS1}"${YELLOW}\`parse_git_branch\`"
+        PS1=${PS1}"${MAGENTA}\`parse_git_status\`"
+    fi
+
+    PS1=${PS1}"${RED}${RETCODE}"
+    PS1=${PS1}"${CYAN}${VENV}"
+    PS1=${PS1}"${RESET} > "
+}
+PROMPT_COMMAND=rozenfel_set_bash_prompt
+
+# PS2
+PS2="${YELLOW}GIVE ME MORE! >${RESET} "
+
+## WIP:
+# get current status of git repo
+function asdf {
+    status=`git -c color.ui=always status 2>&1 | tee`
+    # echo "${status}"
+    untracked=`echo -n "${status}" 2> /dev/null | grep "Untracked files" &> /dev/null; echo "$?"`
+    echo "${untracked}"
+}
