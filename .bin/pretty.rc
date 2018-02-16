@@ -12,7 +12,7 @@ alias ll='ls -laF'
 alias lt='l -t'
 alias llt='ll -t'
 alias lh='l -h'
-alias ll='ll -h'
+alias llh='ll -h'
 alias ssh='ssh '
 alias grep='grep --color=auto'
 
