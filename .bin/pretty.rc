@@ -22,6 +22,7 @@ alias ga="git add"
 alias gsh="git commit -m \"sh\""
 alias gwip="git commit -m \"wip\""
 alias gworks='git commit -m "sh - everything works!"'
+alias gl='git log --all --graph --decorate --pretty=oneline --abbrev-commit'
 
 #  Default editor
 export EDITOR=vim
