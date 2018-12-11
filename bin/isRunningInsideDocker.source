@@ -1,0 +1,5 @@
+isRunningInsideDocker() {
+  set -e
+  grep docker /proc/1/cgroup > /dev/null
+}
+
