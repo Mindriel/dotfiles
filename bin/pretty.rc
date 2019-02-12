@@ -1,7 +1,10 @@
-# Addition to ~/.bashrc
+#@IgnoreInspection BashAddShebang
+
+### Addition to ~/.bashrc
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && echo -e "$-\nUse this only as a source source :)" && return
+# [ "${-#*i}" != "$-" ] && echo contains || echo nope ### dash compliant
 
 #  Aliases
 alias sudo='sudo '
@@ -24,6 +27,11 @@ alias gwip="git commit -m \"wip\""
 alias gworks='git commit -m "sh - everything works!"'
 alias gl='git log --all --graph --decorate --pretty=oneline --abbrev-commit'
 
+# Usefull functions
+gp() {
+  grep -rn "$1" | grep -v "^Binary file" | grep "$1"
+}
+
 #  Default editor
 export EDITOR=vim
 export GIT_EDITOR=vim
@@ -41,32 +49,32 @@ export GIT_EDITOR=vim
 #GRAY_WHITE="$(tput setaf 8)"
 #RESET="$(tput sgr0)"
 ### ^
-RED="\[\e[31m\]"
-GREEN="\[\e[32m\]"
-YELLOW="\[\e[33m\]"
-BLUE="\[\e[34m\]"
-MAGENTA="\[\e[35m\]"
-CYAN="\[\e[36m\]"
-LIGHT_GRAY="\[\e[37m\]"
+RED='\[\e[31m\]'
+GREEN='\[\e[32m\]'
+YELLOW='\[\e[33m\]'
+BLUE='\[\e[34m\]'
+MAGENTA='\[\e[35m\]'
+CYAN='\[\e[36m\]'
+LIGHT_GRAY='\[\e[37m\]'
 
-DARK_GRAY="\[\e[90m\]"
-LIGHT_RED="\[\e[91m\]"
-LIGHT_GREEN="\[\e[92m\]"
-LIGHT_YELLOW="\[\e[93m\]"
-LIGHT_BLUE="\[\e[94m\]"
-LIGHT_MAGENTA="\[\e[95m\]"
-LIGHT_CYAN="\[\e[96m\]"
-LIGHT_WHITE="\[\e[97m\]"
+DARK_GRAY='\[\e[90m\]'
+LIGHT_RED='\[\e[91m\]'
+LIGHT_GREEN='\[\e[92m\]'
+LIGHT_YELLOW='\[\e[93m\]'
+LIGHT_BLUE='\[\e[94m\]' # c_lblue='\[\e[1;34m\]'
+LIGHT_MAGENTA='\[\e[95m\]'
+LIGHT_CYAN='\[\e[96m\]'
+LIGHT_WHITE='\[\e[97m\]'
 
-RESET="\[\e[m\]"
+RESET='\[\e[0m\]'
 
 
 if [ ! -v DEFAULT_USER ]; then
     # LOGNAME vs USER ?
-    DEFAULT_USER=$USER
+    DEFAULT_USER="$USER"
 fi
 
-USER_COLOR=""
+USER_COLOR=''
 case "$HOME" in
     "/home/${DEFAULT_USER}") USER_COLOR="${BLUE}" ;;
     "/root")            USER_COLOR="${RED}"  ;;
@@ -89,9 +97,9 @@ function parse_git_branch() {
 }
 
 function parse_git_status {
-    RED="\e[31m"
-    GREEN="\e[32m"
-    RESTORE="\e[35m" # MAGENTA
+    local RED="\e[31m"
+    local GREEN="\e[32m"
+    local RESTORE="\e[35m" # MAGENTA
 
     status=`git status 2>&1 | tee`
     modified=`echo -n "${status}" 2> /dev/null | grep "modified:" &> /dev/null; echo "$?"`
@@ -142,15 +150,15 @@ function virtualenv_info() {
     [ -n "$venv" ] && echo "(venv:$venv)"
 }
 
-rozenfel_set_bash_prompt() {
-    RETCODE=$?
-    RETCODE=`[ $RETCODE -ne 0 ] && echo " $RETCODE"`
+mindriel_set_bash_prompt() {
+    local RETURN_CODE=$?
+    RETURN_CODE=`[ ${RETURN_CODE} -ne 0 ] && echo " $RETURN_CODE"`
 
     local VENV="\$(virtualenv_info)";
     PS1=${USER_COLOR}"\u"
 
     if [ ! -v OMIT_HOSTNAME ]; then
-        PS1=${PS1}"${YELLOW}@\h${BLUE}"
+        PS1=${PS1}"${YELLOW}@\h${USER_COLOR}"
     fi
 
     PS1=${PS1}"[${GREEN}\W${USER_COLOR}]"
@@ -160,11 +168,11 @@ rozenfel_set_bash_prompt() {
         PS1=${PS1}"${MAGENTA}\`parse_git_status\`"
     fi
 
-    PS1=${PS1}"${RED}${RETCODE}"
+    PS1=${PS1}"${RED}${RETURN_CODE}"
     PS1=${PS1}"${CYAN}${VENV}"
     PS1=${PS1}"${RESET} > "
 }
-PROMPT_COMMAND=rozenfel_set_bash_prompt
+PROMPT_COMMAND=mindriel_set_bash_prompt
 
 # PS2
 PS2="${YELLOW}GIVE ME MORE! >${RESET} "
