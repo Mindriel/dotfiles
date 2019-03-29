@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 BASE_DIR=$(dirname "$0")
 HELPERS_DIR="${BASE_DIR}"/helpers
@@ -44,11 +44,11 @@ if [[ -f 'requirements.txt' ]]; then
   echo 'Installed.'
 fi
 
-echo 'Deactivated:  ${ENV_NAME}/bin/activate ."
+echo "Deactivated:  ${ENV_NAME}/bin/activate ."
 
 echo '-------------------'
 echo "Remember to activate by running:"
-#echo -e "${GREEN}  export VIRTUAL_ENV_DISABLE_PROMPT=1 ${RESET}"
+echo -e "${GREEN}  export VIRTUAL_ENV_DISABLE_PROMPT=1 ${RESET}"
 echo -e "${GREEN}  source ${ENV_NAME}/bin/activate ${RESET}"
 echo '-------------------'
 echo 'Bye bye B-)'
