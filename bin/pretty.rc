@@ -8,24 +8,24 @@
 
 #  Aliases
 alias sudo='sudo '
-alias ls='ls --color=auto'
-alias la='ls -A'
-alias l='ls -lF'
-alias ll='ls -laF'
-alias lt='l -t'
-alias llt='ll -t'
-alias lh='l -h'
-alias llh='ll -h'
 alias ssh='ssh '
 alias grep='grep --color=auto'
+
+alias ls='ls --color=auto'
+alias l='ls -lhF'
+alias ll='ls -lahF'
+alias la='ls -lAhF'
 
 #  GIT aliases
 alias gs="git status"
 alias ga="git add"
+alias gu="git submodule update --init --recursive --remote"
 alias gsh="git commit -m \"sh\""
 alias gwip="git commit -m \"wip\""
 alias gworks='git commit -m "sh - everything works!"'
 alias gl='git log --all --graph --decorate --pretty=oneline --abbrev-commit'
+
+alias tig='tig --all'
 
 # Usefull functions
 gp() {
