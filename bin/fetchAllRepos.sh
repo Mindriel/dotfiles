@@ -44,7 +44,7 @@ fetchAll() {
       printf ' -> %-100s remotes: %s\n' "$tmp" "$remotes"
       #for a in ${A[@]}; do #bash
       for a in $(echo ${A}); do
-        git fetch "$a" --tags || FETCH_FAILED='true'
+        git fetch "$a" --tags --prune --prune-tags || FETCH_FAILED='true'
       done
     fi
   done
