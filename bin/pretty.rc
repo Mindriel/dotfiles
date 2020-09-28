@@ -90,7 +90,9 @@ esac
 
 function parse_git_branch() {
     BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* [(]*\([^)]*\)[)]*/\1/' -e 's/HEAD detached at/{D}/'`
-    if [ ! "${BRANCH}" == "" ]; then
+    if [ 'no branch' == "$BRANCH" ]; then
+        echo `__git_ps1 | sed 's|^.*((\(.*\))).*$|(t: \1)|g'`
+    elif [ ! "${BRANCH}" == "" ]; then
         echo "(${BRANCH})"
     else
         echo ""
