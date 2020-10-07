@@ -8,6 +8,7 @@
 
 #  Aliases
 alias sudo='sudo '
+alias xargs='xargs '
 alias ssh='ssh '
 alias grep='grep --color=auto'
 
