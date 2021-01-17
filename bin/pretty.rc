@@ -7,6 +7,8 @@
 # [ "${-#*i}" != "$-" ] && echo contains || echo nope ### dash compliant
 
 #  Aliases
+alias time='`which time`'
+
 alias sudo='sudo '
 alias xargs='xargs '
 alias ssh='ssh '
